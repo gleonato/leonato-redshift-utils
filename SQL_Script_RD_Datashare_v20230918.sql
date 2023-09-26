@@ -1,29 +1,31 @@
 --comandos no redshift etl (producer) 
 -- reference : https://docs.aws.amazon.com/redshift/latest/dg/within-account.html
 
+--comandos no redshift etl (producer) 
 
+-- check current data sharing on producer cluster
 SHOW DATASHARES;
 
 -- create datashare 
-create datashare ds_raiadrogasil;
+create datashare ds_name;
 
 -- Delegate permissions to operate on the datashare. 
-GRANT ALTER, SHARE ON DATASHARE ds_raiadrogasil TO rdawsuser;
+GRANT ALTER, SHARE ON DATASHARE ds_name TO rdawsuser;
 
 -- add schema to DS
-alter datashare ds_raiadrogasil add schema rd_corp;
+alter datashare ds_name add schema rd_corp;
 
 -- add tables to DS
-ALTER DATASHARE ds_raiadrogasil ADD all tables in schema rd_corp;
+ALTER DATASHARE ds_name ADD all tables in schema rd_corp;
 
 -- add consumers to DS 
-grant usage on datashare ds_raiadrogasil to namespace '9422eaad-988d-443a-86c4-32f4896706ac'; -- consumer cluster namespace
+grant usage on datashare ds_name to namespace '9422eaad-988d-443a-86c4-32f4896706ac'; -- consumer cluster namespace
 
 -- (Optional) Add security restrictions to the datashare. The following example shows that the consumer cluster with a public IP access is allowed to read the datashare.
-ALTER DATASHARE ds_raiadrogasil SET PUBLICACCESSIBLE = TRUE;
+ALTER DATASHARE ds_name SET PUBLICACCESSIBLE = TRUE;
 
 -- Displays the outbound datashares in the producer cluster
-DESC DATASHARE ds_raiadrogasil;
+DESC DATASHARE ds_name;
 
 -- Check Which namespace or clusters have I granted usage to datashare 
 select * from svv_datashare_consumers;
@@ -32,9 +34,9 @@ select * from svv_datashare_consumers;
 ------------inicio comando redshift consumer
 -- SHOW DATASHARES;
 
-DESC DATASHARE ds_raiadrogasil OF NAMESPACE '6e012a22-3a14-46e4-8033-f9c5d35dac28';
+DESC DATASHARE ds_name OF NAMESPACE '6e012a22-3a14-46e4-8033-f9c5d35dac28';
 
-create database etl2consumer_db from datashare ds_raiadrogasil of namespace '6e012a22-3a14-46e4-8033-f9c5d35dac28'; -- PRODUCER cluster namespace  '6e012a22-3a14-46e4-8033-f9c5d35dac28'
+create database etl2consumer_db from datashare ds_name of namespace '6e012a22-3a14-46e4-8033-f9c5d35dac28'; -- PRODUCER cluster namespace  '6e012a22-3a14-46e4-8033-f9c5d35dac28'
 
 grant usage on database etl2consumer_db to rdawsuser;
 
@@ -49,7 +51,7 @@ select * from svv_datashare_consumers;
 
 --- testes
 -- data sharing 
-teste de tempo para habilitar big tables
-teste de criacao de nova tabela
-grants 
+-- teste de tempo para habilitar big tables
+-- teste de criacao de nova tabela
+-- grants 
 ---  confirmar qualquer tipo de alteracao nao afeta o data sharing 
